@@ -1,0 +1,27 @@
+name: tests
+on:
+  push:
+    branches: ['*']
+  pull_request:
+    branches: ['*']
+jobs:
+  test-dev:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: build and start dev environment
+        run: docker compose up build -d
+      - name: check services
+        run: docker compose ps -a
+      - name: clean
+        run: docker compose down
+    test-prod:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: build and start prod environment
+        run: docker compose -f docker-compose.prod.yml up -d
+      - name: check services
+        run: docker compose -f docker-compose.prod.yml ps
+      - name: clean up
+        run: docker compose -f docker-compose.prod.yml down
