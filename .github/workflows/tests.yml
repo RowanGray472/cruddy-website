@@ -9,7 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: build and start dev environment
+      - name: create environment
+        run: echo "${{ secrets.ENV_DEV }}" > .env.dev
+      - name: build and start container
         run: docker compose up build -d
       - name: check services
         run: docker compose ps -a
@@ -19,6 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: create environment
+        run |
+        echo "${{ secrets.ENV_PROD }}" > .env.prod
+        echo "${{ secrets.ENV_PROD_DB }}" > .env.prod.db
       - name: build and start prod environment
         run: docker compose -f docker-compose.prod.yml up -d
       - name: check services
