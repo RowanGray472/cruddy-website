@@ -1,14 +1,9 @@
-## flask-on-docker
+## cruddy-website
 
-This repo contains the code for a demo Flask app built using the full Instagram tech stack. Specifically, it uses nginx for the web load balancer, Flask+Gunicorn  for the web framework, pg\_bouncer for the database load balancer, and PostgreSQL for the database itself. 
+This will be a cruddy website. Be afraid.
 
-Everything is coordinated with Docker and the project has dev and prod environments.
+[![](https://github.com/RowanGray472/cruddy-website/workflows/tests/badge.svg)](https://github.com/RowanGray472/cruddy-website/actions?query=workflow%3Atests)
 
-The website itself is super minimalistic—the challenge here was assembling the stack so I can use it again for projects that might actually require it.
-
-But it can upload and render GIFs! Check it out—apologies for the low video quality :(
-
-![Demo of uploading and rendering the gif!](https://github.com/RowanGray472/flask-on-docker/blob/main/9lhe8x.gif)
 
 ### Build Instructions
 
