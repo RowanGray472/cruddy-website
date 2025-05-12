@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: create environment
-        run |
+        run: |
         echo "${{ secrets.ENV_PROD }}" > .env.prod
         echo "${{ secrets.ENV_PROD_DB }}" > .env.prod.db
       - name: build and start prod environment
