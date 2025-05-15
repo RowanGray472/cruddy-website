@@ -5,6 +5,21 @@ from sqlalchemy import text
 import argparse
 import sys
 import time
+import os
+from dotenv import load_dotenv
+
+# Check if running on host or in container
+if os.path.exists('/.dockerenv'):
+    # Running in Docker
+    env_file = '.env.dev.container'
+else:
+    # Running on host
+    env_file = '.env.dev.host'
+
+# Load environment variables from the appropriate file
+load_dotenv(env_file)
+
+db_url = os.getenv('DATABASE_URL')
 
 def cleanup_duplicate_accounts():
     """
@@ -13,10 +28,11 @@ def cleanup_duplicate_accounts():
     """
     print("Starting duplicate account cleanup process...")
     start_time = time.time()
+
     
     # Create database connection with appropriate timeout settings
     engine = sqlalchemy.create_engine(
-        'postgresql://hello_flask:hello_flask@localhost:5052/hello_flask_dev',
+        db_url,
         pool_size=5,
         max_overflow=10,
         pool_timeout=30,
@@ -171,7 +187,7 @@ def cleanup_duplicate_accounts():
 def analyze_duplicate_distribution():
     """Analyze and report on the distribution of duplicate accounts without deleting"""
     engine = sqlalchemy.create_engine(
-        'postgresql://hello_flask:hello_flask@localhost:5052/hello_flask_dev'
+        db_url
     )
     
     query = """

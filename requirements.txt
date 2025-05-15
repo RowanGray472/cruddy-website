@@ -1,6 +1,0 @@
-Faker==37.1.0
-greenlet==3.2.2
-postgis==1.0.4
-psycopg2==2.9.8
-SQLAlchemy==1.4.51
-tzdata==2025.2

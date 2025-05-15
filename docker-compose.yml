@@ -7,7 +7,7 @@ services:
     ports:
       - 5051:5000
     env_file:
-      - ./.env.dev
+      - ./.env.dev.container
     environment:
       - POSTGRES_DB_INIT=true
     depends_on:

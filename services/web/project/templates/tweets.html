@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="tweets-header">
+    <h2>Twitter Data Explorer</h2>
+    <p>Browsing {{ total_count }} tweets from our database</p>
+</div>
+
+{% if tweets %}
+    <div class="tweets-container">
+        {% for tweet in tweets %}
+            <div class="tweet-card">
+                <div class="tweet-header">
+                    <div class="user-info">
+                        <div class="avatar">
+                            <span>{{ tweet.user.screen_name[0] | upper }}</span>
+                        </div>
+                        <div class="user-details">
+                            <span class="user-name">{{ tweet.user.name }}
+                                {% if tweet.user.verified %}
+                                    <span class="verified-badge" title="Verified Account">✓</span>
+                                {% endif %}
+                            </span>
+                            <span class="user-handle">@{{ tweet.user.screen_name }}</span>
+                        </div>
+                    </div>
+                    <div class="tweet-date" title="{{ tweet.created_at }}">
+                        {{ tweet.created_at.strftime('%b %d, %Y') }}
+                    </div>
+                </div>
+                
+                <div class="tweet-content">
+                    {% if tweet.is_retweet %}
+                        <div class="retweet-indicator">
+                            <i class="fa fa-retweet"></i> Retweeted
+                        </div>
+                    {% elif tweet.is_quote %}
+                        <div class="quote-indicator">
+                            <i class="fa fa-quote-right"></i> Quoted Tweet
+                        </div>
+                    {% endif %}
+                    
+                    <p class="tweet-text">{{ tweet.text }}</p>
+                    
+                    {% if tweet.media %}
+                        <div class="tweet-media">
+                            {% for item in tweet.media %}
+                                {% if item.type == 'photo' %}
+                                    <a href="{{ item.url }}" target="_blank" class="media-item">
+                                        <div class="media-placeholder">
+                                            <span>📷 Photo</span>
+                                        </div>
+                                    </a>
+                                {% elif item.type == 'video' %}
+                                    <a href="{{ item.url }}" target="_blank" class="media-item">
+                                        <div class="media-placeholder video">
+                                            <span>🎬 Video</span>
+                                        </div>
+                                    </a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="tweet-footer">
+                    <div class="tweet-stats">
+                        <span class="stat"><i class="fa fa-retweet"></i> {{ tweet.retweet_count }}</span>
+                        <span class="stat"><i class="fa fa-heart"></i> {{ tweet.favorite_count }}</span>
+                        {% if tweet.quote_count %}
+                        <span class="stat"><i class="fa fa-quote-right"></i> {{ tweet.quote_count }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    {% if tweet.hashtags %}
+                        <div class="tweet-tags">
+                            {% for tag in tweet.hashtags %}
+                                <span class="hashtag">#{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    {% if tweet.location.place_name %}
+                        <div class="tweet-location">
+                            <i class="fa fa-map-marker"></i> 
+                            {{ tweet.location.place_name }}
+                            {% if tweet.location.country_code %}
+                                ({{ tweet.location.country_code }})
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="tweet-source">
+                        via {{ tweet.source|safe }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    {% if total_pages > 1 %}
+    <div class="pagination">
+        <p>
+            Page {{ page }} of {{ total_pages }}
+            
+            {% if has_prev %}
+            <a href="/tweets?page={{ page - 1 }}" class="page-link">&laquo; Previous</a>
+            {% else %}
+            <span class="disabled">&laquo; Previous</span>
+            {% endif %}
+            
+            {% if has_next %}
+            <a href="/tweets?page={{ page + 1 }}" class="page-link">Next &raquo;</a>
+            {% else %}
+            <span class="disabled">Next &raquo;</span>
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+{% else %}
+    <div class="no-tweets">
+        <p>No tweets available in the database.</p>
+    </div>
+{% endif %}
+
+{% endblock %}
+

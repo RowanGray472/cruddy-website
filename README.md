@@ -53,3 +53,12 @@ To spin down the containers when you're done run this.
 ```
 $ docker-compose down -v
 ```
+
+
+various commands
+
+docker compose -f docker-compose.prod.yml down -v
+
+docker compose -f docker-compose.prod.yml up -d --build
+
+docker compose exec web sh /home/app/web/execute_load_data.sh

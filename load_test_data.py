@@ -13,6 +13,21 @@ from postgis import Geometry, Point, MultiPolygon, Polygon
 import postgis.psycopg
 import time
 import os
+from dotenv import load_dotenv
+
+# Check if running on host or in container
+if os.path.exists('/.dockerenv'):
+    # Running in Docker
+    env_file = '.env.dev.container'
+else:
+    # Running on host
+    env_file = '.env.dev.host'
+
+# Load environment variables from the appropriate file
+load_dotenv(env_file)
+
+
+db_url = os.environ['DATABASE_URL']
 
 def generate_random_data(num_users=50, num_tweets=100, user_id_start=-1, tweet_id_start=-1):
     """Generate random data for the database schema"""
@@ -23,7 +38,7 @@ def generate_random_data(num_users=50, num_tweets=100, user_id_start=-1, tweet_i
     
     # Add connection pooling parameters
     engine = sqlalchemy.create_engine(
-        'postgresql://hello_flask:hello_flask@localhost:5052/hello_flask_dev',
+        db_url,
         pool_size=10,  # Maintain a pool of connections
         max_overflow=10,  # Allow up to 10 connections beyond pool_size
         pool_timeout=30,  # Wait up to 30 seconds for a connection
@@ -39,8 +54,6 @@ def generate_random_data(num_users=50, num_tweets=100, user_id_start=-1, tweet_i
     
     id_users = user_id_start
     id_tweets = tweet_id_start
-    
-    # IMPORTANT CHANGE: Break up the giant transaction into smaller, focused transactions
     
     # Step 1: Generate and insert users
     print(f"Process {os.getpid()}: Generating users...")

@@ -4,7 +4,7 @@ BEGIN;
 
 CREATE TABLE accounts (
     id_users BIGINT PRIMARY KEY,
-    username TEXT,
+    username TEXT,  
     password TEXT
 );
 
@@ -12,9 +12,9 @@ CREATE TABLE messages (
     id_users BIGINT,
     id_message BIGINT,
     message_text TEXT,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id_users, id_message)  -- Added composite primary key
 );
-
 
 /*
  * Users may be partially hydrated with only a name/screen_name 
@@ -60,31 +60,39 @@ CREATE TABLE tweets (
     state_code VARCHAR(2),
     lang TEXT,
     place_name TEXT,
-    geo geometry
+    geo geometry,
+    FOREIGN KEY(id_users) REFERENCES users(id_users)
 );
 
 CREATE TABLE tweet_urls (
     id_tweets BIGINT,
-    url TEXT
+    url TEXT,
+    PRIMARY KEY (id_tweets, url),  -- Added composite primary key
+    FOREIGN KEY (id_tweets) REFERENCES tweets(id_tweets)
 );
-
 
 CREATE TABLE tweet_mentions (
     id_tweets BIGINT,
-    id_users BIGINT
+    id_users BIGINT,
+    PRIMARY KEY (id_tweets, id_users),  -- Added composite primary key
+    FOREIGN KEY (id_tweets) REFERENCES tweets(id_tweets),
+    FOREIGN KEY (id_users) REFERENCES users(id_users)
 );
 
 CREATE TABLE tweet_tags (
     id_tweets BIGINT,
-    tag TEXT
+    tag TEXT,
+    PRIMARY KEY (id_tweets, tag),  -- Added composite primary key
+    FOREIGN KEY (id_tweets) REFERENCES tweets(id_tweets)
 );
 COMMENT ON TABLE tweet_tags IS 'This table links both hashtags and cashtags';
-
 
 CREATE TABLE tweet_media (
     id_tweets BIGINT,
     url TEXT,
-    type TEXT
+    type TEXT,
+    PRIMARY KEY (id_tweets, url),  -- Added composite primary key
+    FOREIGN KEY (id_tweets) REFERENCES tweets(id_tweets)
 );
 
 /*

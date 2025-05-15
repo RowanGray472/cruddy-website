@@ -86,6 +86,10 @@ input[type="submit"] {
 input[type="submit"]:hover {
   background-color: #0c85d0;
 }
+.highlight {
+    background-color: #ffff00;
+    font-weight: bold;
+}
 
 /* Messages */
 .messages-container {
@@ -148,6 +152,204 @@ input[type="submit"]:hover {
         border-radius: 3px;
         color: #ccc;
     }
+    /* Tweet page styling */
+.tweets-header {
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #e1e8ed;
+    padding-bottom: 20px;
+}
+
+.tweets-header h2 {
+    color: #1da1f2;
+    margin-bottom: 5px;
+}
+
+.tweets-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.tweet-card {
+    background-color: white;
+    border: 1px solid #e1e8ed;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    padding: 15px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.tweet-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.tweet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #1da1f2;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.user-handle {
+    color: #657786;
+    font-size: 14px;
+}
+
+.verified-badge {
+    color: #1da1f2;
+    font-size: 14px;
+    margin-left: 3px;
+}
+
+.tweet-date {
+    color: #657786;
+    font-size: 14px;
+}
+
+.tweet-content {
+    margin-bottom: 15px;
+}
+
+.retweet-indicator, .quote-indicator {
+    color: #657786;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.tweet-text {
+    font-size: 16px;
+    line-height: 1.4;
+    margin-bottom: 10px;
+    white-space: pre-wrap;
+}
+
+.tweet-media {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.media-item {
+    flex: 1 0 calc(50% - 10px);
+    min-width: 200px;
+    text-decoration: none;
+}
+
+.media-placeholder {
+    height: 150px;
+    background-color: #f5f8fa;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e1e8ed;
+    color: #657786;
+}
+
+.media-placeholder.video {
+    background-color: #eef7ff;
+}
+
+.tweet-footer {
+    border-top: 1px solid #e1e8ed;
+    padding-top: 10px;
+    font-size: 14px;
+    color: #657786;
+}
+
+.tweet-stats {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.stat i {
+    margin-right: 3px;
+}
+
+.tweet-tags {
+    margin-bottom: 10px;
+}
+
+.hashtag {
+    color: #1da1f2;
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+.tweet-location {
+    margin-bottom: 5px;
+}
+
+.tweet-source {
+    font-size: 12px;
+    color: #8899a6;
+}
+
+.pagination {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.page-link {
+    display: inline-block;
+    padding: 8px 15px;
+    background: #1da1f2;
+    color: white;
+    text-decoration: none;
+    border-radius: 20px;
+    margin: 0 5px;
+}
+
+.page-link:hover {
+    background: #0c85d0;
+}
+
+.disabled {
+    display: inline-block;
+    padding: 8px 15px;
+    background: #e1e8ed;
+    color: #8899a6;
+    border-radius: 20px;
+    margin: 0 5px;
+}
+
+.no-tweets {
+    text-align: center;
+    padding: 40px 0;
+    color: #657786;
+}
 </style>
 
     </head>
@@ -159,8 +361,10 @@ input[type="submit"]:hover {
             <li><a href='/logout'>Logout</a></li>
             <li><a href='/create_message'>Create Message</a></li>
             <li><a href='/search'>Search</a></li>
+            <li><a href="/tweets">Tweets</a></li>
             {% else %}
             <li><a href='/login'>Login</a></li>
+            <li><a href="/tweets">Tweets</a></li>
             <li><a href='/create_account'>Create Account</a></li>
             <li><a href='/search'>Search</a></li>
             {% endif %}

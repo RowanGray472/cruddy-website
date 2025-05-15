@@ -3,12 +3,27 @@
 import sqlalchemy
 from sqlalchemy import text
 import time
+import os
+import sys
+# Check if running on host or in container
+if os.path.exists('/.dockerenv'):
+    # Running in Docker
+    env_file = '.env.dev.container'
+else:
+    # Running on host
+    env_file = '.env.dev.host'
+
+# Load environment variables from the appropriate file
+from dotenv import load_dotenv
+load_dotenv(env_file)
+
+db_url = os.environ['DATABASE_URL']
 
 def create_rum_indexes():
     """Create RUM indexes to optimize database queries for text search with ranking and ordering."""
     
     print("Connecting to database...")
-    engine = sqlalchemy.create_engine('postgresql://hello_flask:hello_flask@localhost:5052/hello_flask_dev')
+    engine = sqlalchemy.create_engine(db_url)
     
     with engine.begin() as connection:
         print("Connected successfully. Setting up RUM indexes...")

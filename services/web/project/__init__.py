@@ -4,6 +4,7 @@ from flask import Flask, jsonify, send_from_directory, request, render_template,
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from geoalchemy2 import Geometry
+import re
 
 app = Flask(__name__)
 app.config.from_object("project.config.Config")
@@ -416,11 +417,20 @@ def create_account():
         return render_template('create_account.html', error="Username already exists")
     
     try:
-        # Create a new account
-        new_account = Account(username=username, password=password)
+        # Manually assign id_users to be one more than the current max
+        max_account_id = db.session.query(db.func.max(Account.id_users)).scalar() or 0
+        max_user_id = db.session.query(db.func.max(User.id_users)).scalar() or 0
+        next_id = max(max_account_id, max_user_id) + 1
+
+        # Create a new account with the computed id_users
+        new_account = Account(
+            id_users=next_id,
+            username=username,
+            password=password
+        )
         db.session.add(new_account)
         db.session.flush()  # Get the ID before committing
-        
+
         # Create a corresponding user record
         new_user = User(
             id_users=new_account.id_users,
@@ -437,6 +447,7 @@ def create_account():
     except Exception as e:
         db.session.rollback()
         return render_template('create_account.html', error=f"Error creating account: {str(e)}")
+
 
 
 @app.route("/create_message", methods=['GET', 'POST'])
@@ -541,20 +552,30 @@ def search():
                 search_sql,
                 {'query': query_text, 'limit': per_page, 'offset': offset}
             )
-
+            query_time = time.time() - start_time
+            query_time_ms = int(query_time * 1000)
             # Process results
             for row in result:
+                # Get the message text and split the query into words
+                message_text = row.message_text
+                search_terms = query_text.lower().split()
+
+                # Create highlighted version of the message
+                highlighted_text = message_text
+                for term in search_terms:
+                    if len(term) > 2:  # Only highlight meaningful terms
+                        pattern = re.compile(r'\b(' + re.escape(term) + r')\b', re.IGNORECASE)
+                        highlighted_text = pattern.sub(r'<span class="highlight">\1</span>', highlighted_text)
+
                 results.append({
                     'id': row.id_message,
                     'text': row.message_text,
+                    'highlighted_text': highlighted_text,
                     'created_at': row.created_at,
                     'username': row.username,
                     'is_own': str(row.id_users) == user_id if user_id else False
                 })
 
-            # Calculate query time
-            query_time = time.time() - start_time
-            query_time_ms = int(query_time * 1000)
 
         except Exception as e:
             # Make sure to define all template variables even when an exception occurs
@@ -587,4 +608,164 @@ def search():
                           has_next=has_next,
                           query_time_ms=query_time_ms)
     
+@app.route("/all_messages")
+def all_messages():
+    # login check
+    username = request.cookies.get('username')
+    password = request.cookies.get('password')
+    user_id = request.cookies.get('id_users')
+    good_credentials = check_credentials(username, password)
+    
+    # Get pagination parameters
+    page = int(request.args.get('page', 1))
+    per_page = 50  # Show more messages per page
+    
+    try:
+        # Get total count for pagination
+        total_count = db.session.query(Message).count()
+        
+        # Get paginated messages
+        paginated_messages = db.session.query(
+            Message, Account.username
+        ).join(
+            Account, Message.id_users == Account.id_users
+        ).order_by(
+            Message.created_at.desc()
+        ).limit(per_page).offset((page - 1) * per_page).all()
 
+        # Format messages
+        messages = []
+        for message, username in paginated_messages:
+            messages.append({
+                'id': message.id_message,
+                'text': message.message_text,
+                'created_at': message.created_at,
+                'username': username,
+                'is_own': str(message.id_users) == user_id if user_id else False
+            })
+            
+        # Calculate pagination values
+        total_pages = max(1, (total_count + per_page - 1) // per_page)
+        has_prev = page > 1
+        has_next = page < total_pages
+            
+    except Exception as e:
+        print(f"Error fetching messages: {e}")
+        messages = []
+        total_pages = 1
+        has_prev = False
+        has_next = False
+        
+    return render_template('all_messages.html', 
+                           logged_in=good_credentials, 
+                           messages=messages, 
+                           page=page,
+                           total_pages=total_pages,
+                           has_prev=has_prev,
+                           has_next=has_next)
+
+@app.route("/tweets")
+def tweets():
+    # login check
+    username = request.cookies.get('username')
+    password = request.cookies.get('password')
+    user_id = request.cookies.get('id_users')
+    good_credentials = check_credentials(username, password)
+
+    # Get pagination parameters
+    page = int(request.args.get('page', 1))
+    per_page = 20  # Show 20 tweets per page
+
+    try:
+        # Get total count for pagination
+        total_count = db.session.query(Tweet).count()
+
+        # Get paginated tweets with related data
+        tweets_data = db.session.query(Tweet).join(
+            User, Tweet.id_users == User.id_users
+        ).order_by(
+            Tweet.created_at.desc()
+        ).limit(per_page).offset((page - 1) * per_page).all()
+
+        # Format tweets
+        tweets = []
+        for tweet in tweets_data:
+            # Get hashtags
+            hashtags = [tag.tag for tag in tweet.tags]
+
+            # Get mentions with user information
+            mentions = []
+            for mention in tweet.mentions:
+                # Try to get the mentioned user's information
+                mentioned_user = User.query.get(mention.id_users)
+                if mentioned_user:
+                    mentions.append({
+                        'id': mention.id_users,
+                        'screen_name': mentioned_user.screen_name,
+                        'name': mentioned_user.name
+                    })
+
+            # Get media items
+            media_items = [{'url': m.url, 'type': m.type} for m in tweet.media]
+
+            # Format URLs
+            urls = [{'url': u.url} for u in tweet.urls]
+
+            # Check if it's a retweet/quote
+            is_retweet = tweet.text.startswith('RT @')
+            is_quote = tweet.quoted_status_id is not None
+
+            # Get Tweet info
+            tweet_info = {
+                'id': tweet.id_tweets,
+                'text': tweet.text,
+                'created_at': tweet.created_at,
+                'retweet_count': tweet.retweet_count,
+                'favorite_count': tweet.favorite_count,
+                'quote_count': tweet.quote_count,
+                'source': tweet.source,
+                'lang': tweet.lang,
+                'user': {
+                    'id': tweet.user.id_users,
+                    'screen_name': tweet.user.screen_name,
+                    'name': tweet.user.name,
+                    'description': tweet.user.description,
+                    'location': tweet.user.location,
+                    'verified': tweet.user.verified,
+                    'url': tweet.user.url
+                },
+                'hashtags': hashtags,
+                'mentions': mentions,
+                'media': media_items,
+                'urls': urls,
+                'is_retweet': is_retweet,
+                'is_quote': is_quote,
+                'location': {
+                    'place_name': tweet.place_name,
+                    'country_code': tweet.country_code,
+                    'state_code': tweet.state_code
+                }
+            }
+            tweets.append(tweet_info)
+
+        # Calculate pagination values
+        total_pages = max(1, (total_count + per_page - 1) // per_page)
+        has_prev = page > 1
+        has_next = page < total_pages
+
+    except Exception as e:
+        print(f"Error fetching tweets: {e}")
+        tweets = []
+        total_pages = 1
+        has_prev = False
+        has_next = False
+        total_count = 0
+
+    return render_template('tweets.html',
+                          logged_in=good_credentials,
+                          tweets=tweets,
+                          page=page,
+                          total_pages=total_pages,
+                          total_count=total_count,
+                          has_prev=has_prev,
+                          has_next=has_next)

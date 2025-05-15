@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<h3>Recent Messages</h3>
+<h3>All Messages</h3>
 
 {% if messages %}
     <div class="messages-container">
@@ -19,20 +19,34 @@
         {% endfor %}
     </div>
     
-    <div class="view-all-button">
-        <a href="/all_messages" class="btn">View All Messages</a>
+    {% if total_pages > 1 %}
+    <div class="pagination">
+        <p>
+            Page {{ page }} of {{ total_pages }}
+            
+            {% if has_prev %}
+            <a href="/all_messages?page={{ page - 1 }}">&laquo; Previous</a>
+            {% else %}
+            <span class="disabled">&laquo; Previous</span>
+            {% endif %}
+            
+            {% if has_next %}
+            <a href="/all_messages?page={{ page + 1 }}">Next &raquo;</a>
+            {% else %}
+            <span class="disabled">Next &raquo;</span>
+            {% endif %}
+        </p>
     </div>
+    {% endif %}
 {% else %}
     <p>No messages to display.</p>
 {% endif %}
 
+<p><a href="/">Back to Recent Messages</a></p>
+
 {% if logged_in %}
     <p>
         <a href="/create_message">Post a new message</a>
-    </p>
-{% else %}
-    <p>
-        <a href="/login">Login to post messages</a> or <a href="/create_account">create an account</a>
     </p>
 {% endif %}
 

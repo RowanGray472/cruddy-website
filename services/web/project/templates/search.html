@@ -30,19 +30,18 @@
         </p>
         
         <div class="messages-container">
-            {% for message in results %}
-                <div class="message {% if message.is_own %}own-message{% endif %}">
-                    <p>{{ message.text }}</p>
-                    <div class="message-meta">
-                        <small>Posted by: <strong>{{ message.username }}</strong> at {{ message.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
-                        {% if message.is_own %}
-                            <span class="message-tag">(Your message)</span>
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
+    {% for message in results %}
+        <div class="message {% if message.is_own %}own-message{% endif %}">
+            <p>{{ message.highlighted_text | safe }}</p>
+            <div class="message-meta">
+                <small>Posted by: <strong>{{ message.username }}</strong> at {{ message.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                {% if message.is_own %}
+                    <span class="message-tag">(Your message)</span>
+                {% endif %}
+            </div>
         </div>
-        
+    {% endfor %}
+</div>        
         {% if total_pages > 1 %}
         <div class="pagination">
             <p>
