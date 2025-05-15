@@ -29,7 +29,8 @@ DATABASE=postgres
 APP_FOLDER=/home/app/web
 ```
 
-Finally you need to make a .env.dev.
+change to env dev container in a sec
+Finally you need to make a .env.d
 
 ```
 FLASK_APP=project/__init__.py
