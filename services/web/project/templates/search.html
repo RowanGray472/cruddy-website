@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h3>Search Messages</h3>
+
+{% if error %}
+<p style='color: red;'>
+    Error: {{ error }}
+</p>
+{% endif %}
+
+<form action='/search' method="POST">
+    <table>
+        <tr>
+            <td>Search:</td>
+            <td><input type="text" name="query" value="{{ query }}" placeholder="Enter search terms..."></td>
+            <td><input type="submit" value="Search"></td>
+        </tr>
+    </table>
+</form>
+
+{% if query %}
+    <h4>Results for: "{{ query }}"</h4>
+    
+    {% if total_results and total_results > 0 %}
+        <p class="search-info">
+            Found {{ total_results }} matching message{% if total_results != 1 %}s{% endif %}
+            {% if query_time_ms is not none %} in {{ query_time_ms }} ms{% endif %}
+        </p>
+        
+        <div class="messages-container">
+            {% for message in results %}
+                <div class="message {% if message.is_own %}own-message{% endif %}">
+                    <p>{{ message.text }}</p>
+                    <div class="message-meta">
+                        <small>Posted by: <strong>{{ message.username }}</strong> at {{ message.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                        {% if message.is_own %}
+                            <span class="message-tag">(Your message)</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        {% if total_pages > 1 %}
+        <div class="pagination">
+            <p>
+                Page {{ page }} of {{ total_pages }}
+                
+                {% if has_prev %}
+                <a href="/search?query={{ query }}&page={{ page - 1 }}">&laquo; Previous</a>
+                {% else %}
+                <span class="disabled">&laquo; Previous</span>
+                {% endif %}
+                
+                {% if has_next %}
+                <a href="/search?query={{ query }}&page={{ page + 1 }}">Next &raquo;</a>
+                {% else %}
+                <span class="disabled">Next &raquo;</span>
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+    {% else %}
+        <p>No messages found matching your search.</p>
+    {% endif %}
+{% endif %}
+
+{% endblock %}

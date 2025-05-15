@@ -1,4 +1,6 @@
 __pycache__
 .env*
-
+*venv/
 *.sw?
+nohup.out
+restart_website.sh

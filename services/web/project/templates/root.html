@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h3>Recent Messages</h3>
+
+{% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+            <div class="message {% if message.is_own %}own-message{% endif %}">
+                <p>{{ message.text }}</p>
+                <div class="message-meta">
+                    <small>Posted by: <strong>{{ message.username }}</strong> at {{ message.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                    {% if message.is_own %}
+                        <span class="message-tag">(Your message)</span>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No messages to display.</p>
+{% endif %}
+
+{% if logged_in %}
+    <p>
+        <a href="/create_message">Post a new message</a>
+    </p>
+{% else %}
+    <p>
+        <a href="/login">Login to post messages</a> or <a href="/create_account">create an account</a>
+    </p>
+{% endif %}
+
+{% endblock %}

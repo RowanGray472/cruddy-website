@@ -1,0 +1,172 @@
+<html>
+    <head>
+        <title> cruddy twitter clone </title>
+        <style>
+    .messages-container {
+        margin-top: 20px;
+    }
+    {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f8f9fa;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #1da1f2;
+  margin-bottom: 20px;
+}
+
+/* Navigation */
+nav {
+  margin-bottom: 30px;
+}
+
+nav ul {
+  display: flex;
+  list-style: none;
+  background-color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+nav li {
+  margin-right: 15px;
+}
+
+nav a {
+  text-decoration: none;
+  color: #1da1f2;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: background-color 0.2s;
+}
+
+nav a:hover {
+  background-color: #e8f5fe;
+}
+
+/* Forms */
+form {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+input, textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+input[type="submit"] {
+  background-color: #1da1f2;
+  color: white;
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+  width: auto;
+}
+
+input[type="submit"]:hover {
+  background-color: #0c85d0;
+}
+
+/* Messages */
+.messages-container {
+  margin-top: 20px;
+}
+
+.message {
+  border: 1px solid #e1e8ed;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: transform 0.1s;
+}
+
+.message:hover {
+  transform: translateY(-2px);
+}
+
+.own-message {
+  background-color: #e8f5fe;
+  border-color: #c8e1fb;
+}
+    .message p {
+        margin-top: 0;
+    }
+    .message-meta {
+        font-size: 0.85em;
+        color: #666;
+        margin-top: 5px;
+    }
+    .message-tag {
+        background-color: #1890ff;
+        color: white;
+        border-radius: 3px;
+        padding: 2px 5px;
+        margin-left: 10px;
+        font-size: 0.8em;
+    }
+    .pagination {
+        margin: 20px 0;
+        text-align: center;
+    }
+    .pagination a {
+        margin: 0 10px;
+        padding: 5px 10px;
+        background-color: #f0f0f0;
+        border-radius: 3px;
+        text-decoration: none;
+        color: #1890ff;
+    }
+    .pagination a:hover {
+        background-color: #e0e0e0;
+    }
+    .pagination .disabled {
+        margin: 0 10px;
+        padding: 5px 10px;
+        background-color: #f9f9f9;
+        border-radius: 3px;
+        color: #ccc;
+    }
+</style>
+
+    </head>
+    <body>
+        <h1> cruddy twitter clone </h1>
+        <ol>
+            <li><a href='/'>Home</a></li>
+            {% if logged_in %}
+            <li><a href='/logout'>Logout</a></li>
+            <li><a href='/create_message'>Create Message</a></li>
+            <li><a href='/search'>Search</a></li>
+            {% else %}
+            <li><a href='/login'>Login</a></li>
+            <li><a href='/create_account'>Create Account</a></li>
+            <li><a href='/search'>Search</a></li>
+            {% endif %}
+        </ol>
+
+    {% block content %}
+    {% endblock %}
+    </body>
+</html>

@@ -11,7 +11,12 @@ then
     echo "PostgreSQL started"
 fi
 
-python manage.py create_db
+# Check if the database needs to be initialized (first time setup)
+if [ "$POSTGRES_DB_INIT" = "true" ]
+then
+    echo "Initializing database..."
+    python manage.py create_db
+    echo "Database initialized"
+fi
 
 exec "$@"
-
