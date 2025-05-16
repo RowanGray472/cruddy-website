@@ -9,7 +9,12 @@ services:
     env_file:
       - ./.env.dev.container
     environment:
-      - POSTGRES_DB_INIT=true
+      - POSTGRES_DB_INIT=false
+    deploy:
+      resources:
+        limits:
+          cpus: '16'  # Allocate 20% of your CPU resources
+          memory: 8G  # Adjust based on your free memory
     depends_on:
       - db
   db:
@@ -23,6 +28,13 @@ services:
       - POSTGRES_USER=hello_flask
       - POSTGRES_PASSWORD=hello_flask
       - POSTGRES_DB=hello_flask_dev
+    command: postgres -c shared_buffers=512MB -c effective_io_concurrency=200 -c random_page_cost=1.1
+
+    deploy:
+      resources:
+        limits:
+          cpus: '32'  # Increase CPU limit (or higher if available)
+          memory: 32G
 
 volumes:
   postgres_data:

@@ -523,7 +523,7 @@ def search():
             SELECT COUNT(*)
             FROM messages m
             JOIN accounts a ON m.id_users = a.id_users
-            WHERE to_tsvector('english', m.message_text) @@ plainto_tsquery('english', :query)
+            WHERE to_tsvector('english', m.message_text) @@ to_tsquery('english', :query)
             """)
 
             count_result = db.session.execute(count_sql, {'query': query_text}).scalar()
@@ -537,12 +537,12 @@ def search():
                 m.created_at, 
                 m.id_users, 
                 a.username,
-                ts_rank(to_tsvector('english', m.message_text), plainto_tsquery('english', :query)) AS rank
+                ts_rank(to_tsvector('english', m.message_text), to_tsquery('english', :query)) AS rank
             FROM messages m
             JOIN accounts a ON m.id_users = a.id_users
-            WHERE to_tsvector('english', m.message_text) @@ plainto_tsquery('english', :query)
+            WHERE to_tsvector('english', m.message_text) @@ to_tsquery('english', :query)
             ORDER BY 
-                ts_rank(to_tsvector('english', m.message_text), plainto_tsquery('english', :query)) DESC,
+                rank DESC,
                 m.created_at DESC
             LIMIT :limit OFFSET :offset
             """)

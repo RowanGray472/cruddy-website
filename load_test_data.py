@@ -43,17 +43,17 @@ def generate_random_data(num_users=50, num_tweets=100, user_id_start=-1, tweet_i
     # Add connection pooling parameters
     engine = sqlalchemy.create_engine(
         db_url,
-        pool_size=10,  # Maintain a pool of connections
+        pool_size=20,  # Maintain a pool of connections
         max_overflow=10,  # Allow up to 10 connections beyond pool_size
         pool_timeout=30,  # Wait up to 30 seconds for a connection
         pool_recycle=1800  # Recycle connections after 30 minutes
     )
     
     # Define batch sizes - larger batches for better performance
-    USER_BATCH_SIZE = 2000  # Increased batch size
+    USER_BATCH_SIZE = 100000  # Increased batch size
     TWEET_BATCH_SIZE = 10000  # Increased batch size
-    MESSAGE_BATCH_SIZE = 10000
-    ACCOUNT_BATCH_SIZE = 2000
+    MESSAGE_BATCH_SIZE = 100000
+    ACCOUNT_BATCH_SIZE = 200000
     RELATION_BATCH_SIZE = 20000
     
     id_users = user_id_start
