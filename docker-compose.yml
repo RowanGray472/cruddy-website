@@ -13,7 +13,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '16'  # Allocate 20% of your CPU resources
+          cpus: '1'  # Allocate 20% of your CPU resources
           memory: 8G  # Adjust based on your free memory
     depends_on:
       - db
@@ -33,7 +33,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '32'  # Increase CPU limit (or higher if available)
+          cpus: '3'  # Increase CPU limit (or higher if available)
           memory: 32G
 
 volumes:
