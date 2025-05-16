@@ -2,13 +2,13 @@
 
 BEGIN;
 
-CREATE TABLE accounts (
+CREATE TABLE IF NOT EXISTS accounts (
     id_users BIGINT PRIMARY KEY,
     username TEXT,  
     password TEXT
 );
 
-CREATE TABLE messages (
+CREATE TABLE IF NOT EXISTS messages (
     id_users BIGINT,
     id_message BIGINT,
     message_text TEXT,
@@ -21,7 +21,7 @@ CREATE TABLE messages (
  * if they are first encountered during a quote/reply/mention 
  * inside of a tweet someone else's tweet.
  */
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id_users BIGINT PRIMARY KEY,
     created_at TIMESTAMPTZ,
     updated_at TIMESTAMPTZ,
@@ -42,7 +42,7 @@ CREATE TABLE users (
 /*
  * Tweets may be entered in hydrated or unhydrated form.
  */
-CREATE TABLE tweets (
+CREATE TABLE IF NOT EXISTS tweets (
     id_tweets BIGINT PRIMARY KEY,
     id_users BIGINT,
     created_at TIMESTAMPTZ,
@@ -64,14 +64,14 @@ CREATE TABLE tweets (
     FOREIGN KEY(id_users) REFERENCES users(id_users)
 );
 
-CREATE TABLE tweet_urls (
+CREATE TABLE IF NOT EXISTS tweet_urls (
     id_tweets BIGINT,
     url TEXT,
     PRIMARY KEY (id_tweets, url),  -- Added composite primary key
     FOREIGN KEY (id_tweets) REFERENCES tweets(id_tweets)
 );
 
-CREATE TABLE tweet_mentions (
+CREATE TABLE IF NOT EXISTS tweet_mentions (
     id_tweets BIGINT,
     id_users BIGINT,
     PRIMARY KEY (id_tweets, id_users),  -- Added composite primary key
@@ -79,7 +79,7 @@ CREATE TABLE tweet_mentions (
     FOREIGN KEY (id_users) REFERENCES users(id_users)
 );
 
-CREATE TABLE tweet_tags (
+CREATE TABLE IF NOT EXISTS tweet_tags (
     id_tweets BIGINT,
     tag TEXT,
     PRIMARY KEY (id_tweets, tag),  -- Added composite primary key
@@ -87,7 +87,7 @@ CREATE TABLE tweet_tags (
 );
 COMMENT ON TABLE tweet_tags IS 'This table links both hashtags and cashtags';
 
-CREATE TABLE tweet_media (
+CREATE TABLE IF NOT EXISTS tweet_media (
     id_tweets BIGINT,
     url TEXT,
     type TEXT,
@@ -98,7 +98,7 @@ CREATE TABLE tweet_media (
 /*
  * Precomputes the total number of occurrences for each hashtag
  */
-CREATE MATERIALIZED VIEW tweet_tags_total AS (
+CREATE MATERIALIZED VIEW IF NOT EXISTS tweet_tags_total AS (
     SELECT 
         row_number() over (order by count(*) desc) AS row,
         tag, 
@@ -111,7 +111,7 @@ CREATE MATERIALIZED VIEW tweet_tags_total AS (
 /*
  * Precomputes the number of hashtags that co-occur with each other
  */
-CREATE MATERIALIZED VIEW tweet_tags_cooccurrence AS (
+CREATE MATERIALIZED VIEW IF NOT EXISTS tweet_tags_cooccurrence AS (
     SELECT 
         t1.tag AS tag1,
         t2.tag AS tag2,

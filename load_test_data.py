@@ -17,8 +17,12 @@ from dotenv import load_dotenv
 
 # Check if running on host or in container
 if os.path.exists('/.dockerenv'):
-    # Running in Docker
-    env_file = '.env.dev.container'
+    if os.path.exists('/home/app/web/.env.prod'):
+        env_file = '/home/app/web/.env.prod'
+        print("Running in production Docker environment")
+    else:
+        env_file = '.env.dev.container'
+        print("Running in development Docker environment")
 else:
     # Running on host
     env_file = '.env.dev.host'
